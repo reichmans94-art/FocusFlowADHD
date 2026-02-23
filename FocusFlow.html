@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FocusFlow — Money Made Simple</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#222635;--border:#2e3348;--accent:#f5c842;--accent4:#6b9eff;--text:#e8eaf6;--muted:#7b82a3;--warning:#ff9f43;--danger:#ff6b6b;--safe:#6bffb8;--vice:#c678dd;--vice-dark:rgba(198,120,221,0.12);--vice-border:rgba(198,120,221,0.35)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',sans-serif;font-size:15px;min-height:100vh}
+.app-shell{max-width:430px;margin:0 auto;padding-bottom:90px}
+.welcome-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 28px;text-align:center;gap:22px}
+.welcome-screen.hidden{display:none}
+.welcome-logo{font-size:42px;font-weight:800;color:var(--accent)}
+.welcome-tagline{font-size:16px;color:var(--muted);line-height:1.5}
+.feat-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);text-align:left}
+.feat-row:last-child{border-bottom:none}
+.feat-icon{font-size:20px;width:34px;text-align:center;flex-shrink:0}
+.feat-text{font-size:13px;color:var(--muted)}
+.feat-text strong{color:var(--text)}
+.welcome-features{width:100%;max-width:320px}
+.btn-primary{width:100%;padding:15px;background:var(--accent);color:#000;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 0}
+.logo{font-size:20px;font-weight:800;color:var(--accent)}
+.logo span{color:var(--text)}
+.header-icons{display:flex;gap:14px;align-items:center}
+.icon-btn{font-size:22px;cursor:pointer;background:none;border:none;color:var(--text)}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent4));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#000;cursor:pointer}
+.alert-banner{margin:14px 18px 0;background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.35);border-radius:14px;padding:13px 15px;display:flex;align-items:flex-start;gap:10px;animation:pulseborder 2s infinite}
+@keyframes pulseborder{0%,100%{border-color:rgba(255,107,107,0.35)}50%{border-color:rgba(255,107,107,0.7)}}
+.vice-banner{margin:14px 18px 0;background:var(--vice-dark);border:1px solid var(--vice-border);border-radius:14px;padding:13px 15px;display:flex;align-items:flex-start;gap:10px;animation:vicepulse 2.5s infinite}
+@keyframes vicepulse{0%,100%{border-color:var(--vice-border)}50%{border-color:rgba(198,120,221,0.7)}}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.alert-title{font-weight:700;color:var(--danger);font-size:13px;margin-bottom:2px}
+.vice-alert-title{font-weight:700;color:var(--vice);font-size:13px;margin-bottom:2px}
+.alert-body{color:var(--muted);font-size:12px;line-height:1.4}
+.countdown-strip{display:flex;gap:10px;padding:14px 18px 0;overflow-x:auto;scrollbar-width:none}
+.countdown-strip::-webkit-scrollbar{display:none}
+.cdown-card{flex-shrink:0;min-width:135px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 15px;position:relative;overflow:hidden}
+.cdown-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.cdown-card.payday::before{background:var(--safe)}
+.cdown-card.bills::before{background:var(--accent)}
+.cdown-card.cycle::before{background:var(--accent4)}
+.cdown-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:5px}
+.cdown-num{font-size:30px;font-weight:800;line-height:1}
+.cdown-card.payday .cdown-num{color:var(--safe)}
+.cdown-card.bills .cdown-num{color:var(--accent)}
+.cdown-card.cycle .cdown-num{color:var(--accent4)}
+.cdown-sub{font-size:10px;color:var(--muted);margin-top:4px}
+.budget-section{margin:14px 18px 0;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px}
+.section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:14px}
+.ring-wrap{display:flex;align-items:center;gap:18px}
+.ring-container{position:relative;width:100px;height:100px;flex-shrink:0}
+.ring-container svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:8}
+.ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-size:20px;font-weight:800}
+.ring-pct-label{font-size:10px;color:var(--muted)}
+.stat-row{display:flex;justify-content:space-between;margin-bottom:9px}
+.stat-row:last-child{margin-bottom:0}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-val{font-size:13px;font-weight:600}
+.stat-val.spent{color:var(--warning)}
+.stat-val.remain{color:var(--safe)}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 8px}
+.sec-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px}
+.sec-action{font-size:12px;color:var(--accent);cursor:pointer;font-weight:600}
+.acct-strip{display:flex;gap:10px;padding:0 18px;overflow-x:auto;scrollbar-width:none}
+.acct-strip::-webkit-scrollbar{display:none}
+.acct-tile{flex-shrink:0;width:125px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px;cursor:pointer;transition:border-color .2s,transform .15s}
+.acct-tile:hover{border-color:var(--accent);transform:translateY(-2px)}
+.acct-tile.add-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-style:dashed}
+.acct-icon{font-size:20px;margin-bottom:5px}
+.acct-name{font-size:11px;color:var(--muted);margin-bottom:3px}
+.acct-bal{font-weight:700;font-size:14px}
+.acct-type{font-size:10px;color:var(--muted);margin-top:3px}
+.atm-section{margin:0 18px;background:rgba(107,158,255,0.08);border:1px solid rgba(107,158,255,0.2);border-radius:16px;padding:16px}
+.atm-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.atm-title{font-weight:700;font-size:14px}
+.atm-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.atm-stat{text-align:center}
+.atm-stat-val{font-size:18px;font-weight:800;margin-bottom:3px}
+.atm-stat-val.withdrawals{color:var(--accent4)}
+.atm-stat-val.fees{color:var(--danger)}
+.atm-stat-val.total{color:var(--warning)}
+.atm-stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px}
+.vendors-list{padding:0 18px;display:flex;flex-direction:column;gap:8px}
+.vendor-row{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 15px;display:flex;align-items:center;gap:11px;cursor:pointer;position:relative}
+.vendor-emoji{width:34px;height:34px;background:var(--surface2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.vendor-info{flex:1;min-width:0}
+.vendor-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vendor-freq{font-size:11px;color:var(--muted)}
+.vendor-right{text-align:right;flex-shrink:0}
+.vendor-amount{font-size:13px;font-weight:700;margin-bottom:3px}
+.vendor-delta{font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:20px}
+.vendor-delta.up{color:var(--danger);background:rgba(255,107,107,0.12)}
+.vendor-delta.down{color:var(--safe);background:rgba(107,255,184,0.12)}
+.vendor-delta.same{color:var(--muted);background:var(--surface2)}
+.vendor-flag{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--danger);border:2px solid var(--bg);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.tx-list{padding:0 18px;display:flex;flex-direction:column;gap:6px}
+.tx-row{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:background .2s}
+.tx-row:hover{background:var(--surface2)}
+.tx-emoji{width:30px;height:30px;background:var(--surface2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-date{font-size:11px;color:var(--muted);margin-top:1px}
+.tx-amount{font-size:13px;font-weight:700;flex-shrink:0}
+.tx-amount.debit{color:var(--text)}
+.tx-amount.credit{color:var(--safe)}
+.tx-amount.high{color:var(--danger)}
+.tx-amount.atm{color:var(--accent4)}
+.tx-amount.vice-amt{color:var(--vice)}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px}
+.cat-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px}
+.cat-name{font-size:11px;color:var(--muted);margin-bottom:5px}
+.cat-amount{font-size:15px;font-weight:700;margin-bottom:7px}
+.cat-bar-bg{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:2px}
+.cat-pct{font-size:10px;color:var(--muted);margin-top:4px}
+.compare-chart{padding:0 18px}
+.compare-row{margin-bottom:13px}
+.compare-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}
+.compare-bars{display:flex;gap:3px;height:9px}
+.bar-prev{height:100%;border-radius:3px;background:var(--surface2);border:1px solid var(--border)}
+.bar-curr{height:100%;border-radius:3px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(26,29,39,0.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;color:var(--muted);font-size:8px;gap:3px;transition:color .2s}
+.nav-item.active{color:var(--accent)}
+.nav-item.vice-nav.active{color:var(--vice)}
+.nav-icon{font-size:17px}
+.page{display:none}
+.page.active{display:block}
+.tab-bar{display:flex;gap:6px;padding:12px 18px 0;overflow-x:auto;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;font-family:inherit}
+.tab-btn.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.tab-btn.vice-tab.active{background:var(--vice);color:#fff;border-color:var(--vice)}
+.insight-card{margin:0 18px;background:rgba(107,158,255,0.08);border:1px solid rgba(107,158,255,0.2);border-radius:14px;padding:14px}
+.insight-head{font-weight:700;font-size:14px;margin-bottom:5px}
+.insight-text{font-size:12px;color:var(--muted);line-height:1.6}
+.insight-text strong{color:var(--accent)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(5px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{background:var(--surface);border:1px solid var(--border);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:18px;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:88vh;overflow-y:auto}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:38px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-size:20px;font-weight:800;margin-bottom:5px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.4}
+.form-field{margin-bottom:13px}
+.form-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px;display:block}
+.form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--accent)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:13px;font-weight:600}
+.toggle-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{width:42px;height:23px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:17px;height:17px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle.on::after{transform:translateX(19px)}
+.notif-channel{display:flex;align-items:center;gap:12px;padding:13px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:border-color .2s}
+.notif-channel.active-ch{border-color:var(--accent);background:rgba(245,200,66,0.08)}
+.notif-icon{font-size:22px;width:38px;text-align:center}
+.notif-info{flex:1}
+.notif-name{font-size:13px;font-weight:600}
+.notif-detail{font-size:11px;color:var(--muted);margin-top:2px}
+.notif-check{font-size:16px;color:var(--accent);opacity:0;transition:opacity .2s}
+.notif-channel.active-ch .notif-check{opacity:1}
+.bank-option{display:flex;align-items:center;gap:12px;padding:13px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:border-color .2s}
+.bank-option:hover{border-color:var(--accent)}
+.bank-logo{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.bank-name{font-weight:600;font-size:13px}
+.bank-type{font-size:11px;color:var(--muted)}
+.connect-btn{margin-left:auto;font-size:12px;color:var(--accent);font-weight:700;cursor:pointer}
+.threshold-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.threshold-row:last-child{border-bottom:none}
+.threshold-label{font-size:13px;font-weight:500}
+.threshold-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.threshold-input{width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:inherit;font-size:13px;text-align:right;outline:none}
+.threshold-input:focus{border-color:var(--accent)}
+/* VICE */
+.vice-page-header{margin:18px 18px 0;background:linear-gradient(135deg,rgba(198,120,221,0.18),rgba(198,120,221,0.04));border:1px solid var(--vice-border);border-radius:18px;padding:20px;position:relative;overflow:hidden}
+.vice-page-header::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(198,120,221,0.2),transparent 70%)}
+.vice-header-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.vice-title{font-size:22px;font-weight:800;margin-bottom:3px}
+.vice-subtitle{font-size:12px;color:var(--muted)}
+.vice-warning-badge{background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.4);border-radius:10px;padding:6px 10px;font-size:11px;font-weight:700;color:var(--danger);text-align:center;line-height:1.3;flex-shrink:0}
+.vice-summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.vice-summary-item{text-align:center}
+.vice-summary-val{font-size:22px;font-weight:800;color:var(--vice);margin-bottom:3px}
+.vice-summary-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px}
+.vice-big-warning{margin:13px 18px 0;background:rgba(255,107,107,0.1);border:2px solid rgba(255,107,107,0.45);border-radius:16px;padding:16px;animation:dangerpulse 3s infinite}
+@keyframes dangerpulse{0%,100%{border-color:rgba(255,107,107,0.45)}50%{border-color:rgba(255,107,107,0.8)}}
+.vice-warn-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.vice-warn-icon{font-size:28px}
+.vice-warn-title{font-size:16px;font-weight:800;color:var(--danger)}
+.vice-warn-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.vice-warn-stats{display:flex;gap:14px;flex-wrap:wrap}
+.vice-warn-stat{background:rgba(255,107,107,0.12);border-radius:10px;padding:8px 12px;text-align:center;flex:1;min-width:70px}
+.vice-warn-stat-val{font-size:16px;font-weight:800;color:var(--danger)}
+.vice-warn-stat-label{font-size:10px;color:var(--muted);margin-top:2px}
+.vice-action-row{margin-top:12px;display:flex;gap:8px}
+.vice-action-btn{flex:1;padding:9px;border-radius:10px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit}
+.vice-action-btn.primary{background:var(--vice);color:#fff}
+.vice-action-btn.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.vice-cats{padding:0 18px;display:flex;flex-direction:column;gap:10px}
+.vice-cat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;position:relative;overflow:hidden;transition:border-color .2s}
+.vice-cat-card.alert-level{border-color:rgba(255,107,107,0.4)}
+.vice-cat-card.warn-level{border-color:rgba(255,159,67,0.4)}
+.vice-cat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:16px 0 0 16px}
+.vice-cat-card.alcohol::before{background:#ff9f43}
+.vice-cat-card.adult::before{background:#ff6b6b}
+.vice-cat-card.drugs::before{background:#c678dd}
+.vice-cat-card.dating::before{background:#ff6b9d}
+.vice-cat-card.gambling::before{background:#f5c842}
+.vice-cat-card.subscriptions::before{background:#6b9eff}
+.vice-cat-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.vice-cat-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.vice-cat-icon.alcohol{background:rgba(255,159,67,0.15)}
+.vice-cat-icon.adult{background:rgba(255,107,107,0.15)}
+.vice-cat-icon.drugs{background:rgba(198,120,221,0.15)}
+.vice-cat-icon.dating{background:rgba(255,107,157,0.15)}
+.vice-cat-icon.gambling{background:rgba(245,200,66,0.15)}
+.vice-cat-icon.subscriptions{background:rgba(107,158,255,0.15)}
+.vice-cat-info{flex:1}
+.vice-cat-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.vice-cat-count{font-size:11px;color:var(--muted)}
+.vice-cat-right{text-align:right}
+.vice-cat-amt{font-size:18px;font-weight:800}
+.vice-cat-change{font-size:11px;font-weight:600;margin-top:3px}
+.vice-cat-change.up{color:var(--danger)}
+.vice-cat-change.down{color:var(--safe)}
+.vice-cat-bar-bg{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.vice-cat-bar-fill{height:100%;border-radius:3px}
+.vice-cat-transactions{display:flex;flex-direction:column;gap:6px}
+.vice-tx{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border-radius:10px}
+.vice-tx-name{flex:1;font-size:12px;font-weight:500}
+.vice-tx-date{font-size:11px;color:var(--muted)}
+.vice-tx-amt{font-size:12px;font-weight:700}
+.vice-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-left:6px}
+.vice-badge.red{background:rgba(255,107,107,0.15);color:var(--danger)}
+.vice-badge.yellow{background:rgba(245,200,66,0.15);color:var(--accent)}
+.vice-badge.purple{background:rgba(198,120,221,0.15);color:var(--vice)}
+.vice-trend-card{margin:0 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
+.vice-trend-title{font-size:13px;font-weight:700;margin-bottom:14px}
+.vice-trend-row{margin-bottom:12px}
+.vice-trend-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}
+.vice-trend-bar-bg{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.vice-trend-bar{height:100%;border-radius:4px}
+.vice-support-box{margin:14px 18px 0;background:rgba(107,158,255,0.08);border:1px solid rgba(107,158,255,0.2);border-radius:14px;padding:16px}
+.vice-support-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.vice-support-text{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.vice-support-links{display:flex;flex-direction:column;gap:8px}
+.vice-support-link{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:10px;cursor:pointer}
+.vice-support-link-icon{font-size:18px;width:30px;text-align:center}
+.vice-support-link-text{flex:1}
+.vice-support-link-name{font-weight:600;font-size:13px}
+.vice-support-link-sub{color:var(--muted);font-size:11px}
+/* UPLOAD */
+.drop-zone{border:2px dashed var(--border);border-radius:18px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface)}
+.drop-zone.hover{border-color:var(--accent);background:rgba(245,200,66,0.06)}
+.h14{height:14px} .h20{height:20px}
+</style>
+</head>
+<body>
+
+<!-- WELCOME SCREEN -->
+<div class="welcome-screen" id="welcomeScreen">
+  <div>
+    <div class="welcome-logo">💰 FocusFlow</div>
+    <div class="welcome-tagline">Money made simple for ADHD minds</div>
+  </div>
+  <div class="welcome-features">
+    <div class="feat-row"><span class="feat-icon">🧠</span><span class="feat-text"><strong>ADHD-first</strong> — big numbers, clear alerts, zero clutter</span></div>
+    <div class="feat-row"><span class="feat-icon">📱</span><span class="feat-text"><strong>Text &amp; email alerts</strong> when spending goes out of range</span></div>
+    <div class="feat-row"><span class="feat-icon">🏧</span><span class="feat-text"><strong>ATM tracker</strong> — withdrawals &amp; bank fees tracked separately</span></div>
+    <div class="feat-row"><span class="feat-icon">⚠️</span><span class="feat-text"><strong>Vice tracker</strong> — addictive spending flagged with hard warnings</span></div>
+    <div class="feat-row"><span class="feat-icon">📄</span><span class="feat-text"><strong>Smart import</strong> — upload statements, we auto-match everything</span></div>
+    <div class="feat-row"><span class="feat-icon">🔁</span><span class="feat-text"><strong>Vendor drift</strong> — spot price creep before it hurts</span></div>
+  </div>
+  <button class="btn-primary" onclick="startApp()">Get Started →</button>
+</div>
+
+<!-- APP SHELL -->
+<div class="app-shell" id="appShell" style="display:none">
+
+  <div class="app-header">
+    <div class="logo">Focus<span>Flow</span></div>
+    <div class="header-icons">
+      <button class="icon-btn" onclick="openModal('alertsModal')">🔔</button>
+      <button class="icon-btn" onclick="openModal('notifModal')">📲</button>
+      <div class="avatar" onclick="openModal('settingsModal')">SL</div>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="alert-banner">
+      <div class="alert-icon">⚡</div>
+      <div><div class="alert-title">Spending Spike — Alert Sent!</div>
+      <div class="alert-body">Dining is 47% above normal. Text sent to (555) 012-3456 · 7 min ago</div></div>
+    </div>
+    <div class="vice-banner">
+      <div class="alert-icon">🚨</div>
+      <div><div class="vice-alert-title">Vice Spending Alert</div>
+      <div class="alert-body">$847 spent on flagged categories — 34% above your set limit. <span style="color:var(--vice);font-weight:600;cursor:pointer" onclick="setPage('vice',document.querySelectorAll('.nav-item')[6])">Review now →</span></div></div>
+    </div>
+    <div class="countdown-strip">
+      <div class="cdown-card payday"><div class="cdown-label">Days to Payday</div><div class="cdown-num" id="paydayCount">8</div><div class="cdown-sub">Next: Mar 1</div></div>
+      <div class="cdown-card bills"><div class="cdown-label">Budget Reset</div><div class="cdown-num" id="resetCount">7</div><div class="cdown-sub">March cycle starts</div></div>
+      <div class="cdown-card cycle"><div class="cdown-label">Bills Due</div><div class="cdown-num">5</div><div class="cdown-sub">Rent · Netflix · Phone</div></div>
+    </div>
+    <div class="budget-section" style="margin-top:14px">
+      <div class="section-label">Monthly Budget</div>
+      <div class="ring-wrap">
+        <div class="ring-container">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle class="ring-bg" cx="50" cy="50" r="42"/>
+            <circle class="ring-fill" cx="50" cy="50" r="42" id="budgetRing" stroke="var(--warning)" stroke-dasharray="264" stroke-dashoffset="264"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="ringPct" style="color:var(--warning)">68%</div>
+            <div class="ring-pct-label">used</div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div class="stat-row"><span class="stat-label">Monthly income</span><span class="stat-val">$5,200</span></div>
+          <div class="stat-row"><span class="stat-label">Budget</span><span class="stat-val">$3,900</span></div>
+          <div class="stat-row"><span class="stat-label">Spent</span><span class="stat-val spent">$2,652</span></div>
+          <div class="stat-row"><span class="stat-label">Remaining</span><span class="stat-val remain">$1,248</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="insight-card">
+      <div class="insight-head">💡 Money Snapshot</div>
+      <div class="insight-text">At this pace you'll land at <strong>$3,780</strong> by month end — just under budget. Vice spending is <strong>$847</strong> this month — second biggest category after rent.</div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">Accounts</span><span class="sec-action" onclick="openModal('addAccountModal')">+ Add</span></div>
+    <div class="acct-strip">
+      <div class="acct-tile"><div class="acct-icon">🏦</div><div class="acct-name">Chase Checking</div><div class="acct-bal">$2,841</div><div class="acct-type">Checking ••4729</div></div>
+      <div class="acct-tile"><div class="acct-icon">💳</div><div class="acct-name">Sapphire Card</div><div class="acct-bal" style="color:var(--warning)">$1,240</div><div class="acct-type">Credit ••8823</div></div>
+      <div class="acct-tile"><div class="acct-icon">💰</div><div class="acct-name">Savings</div><div class="acct-bal" style="color:var(--safe)">$8,550</div><div class="acct-type">Savings ••1102</div></div>
+      <div class="acct-tile add-tile" onclick="openModal('addAccountModal')"><div style="font-size:22px;color:var(--muted)">＋</div><div style="font-size:11px;color:var(--muted);text-align:center">Link Account</div></div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">ATM Activity</span><span class="sec-action" onclick="setPage('atm',document.querySelectorAll('.nav-item')[3])">See all</span></div>
+    <div class="atm-section">
+      <div class="atm-header"><span class="atm-title">🏧 February 2026</span><span style="font-size:11px;color:var(--muted)">4 withdrawals</span></div>
+      <div class="atm-stats">
+        <div class="atm-stat"><div class="atm-stat-val withdrawals">$560</div><div class="atm-stat-label">Withdrawn</div></div>
+        <div class="atm-stat"><div class="atm-stat-val fees">$14.00</div><div class="atm-stat-label">Fees</div></div>
+        <div class="atm-stat"><div class="atm-stat-val total">$574</div><div class="atm-stat-label">Total Cost</div></div>
+      </div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">Recent</span><span class="sec-action" onclick="setPage('transactions',document.querySelectorAll('.nav-item')[2])">See all</span></div>
+    <div class="tx-list">
+      <div class="tx-row"><div class="tx-emoji">🍕</div><div class="tx-info"><div class="tx-name">Domino's Pizza</div><div class="tx-date">Today 7:43 PM</div></div><div class="tx-amount high">−$42.80</div></div>
+      <div class="tx-row" style="border-color:rgba(198,120,221,0.35)"><div class="tx-emoji" style="background:rgba(198,120,221,0.15)">🍸</div><div class="tx-info"><div class="tx-name">Bar Tab — Lucky's <span class="vice-badge purple">VICE</span></div><div class="tx-date">Today 11:30 PM</div></div><div class="tx-amount vice-amt">−$87.00</div></div>
+      <div class="tx-row"><div class="tx-emoji">⛽</div><div class="tx-info"><div class="tx-name">Shell Gas Station</div><div class="tx-date">Today 2:11 PM</div></div><div class="tx-amount debit">−$68.00</div></div>
+      <div class="tx-row" style="border-color:rgba(255,107,107,0.35)"><div class="tx-emoji" style="background:rgba(255,107,107,0.15)">💋</div><div class="tx-info"><div class="tx-name">OnlyFans Sub <span class="vice-badge red">VICE ⚠</span></div><div class="tx-date">Feb 21</div></div><div class="tx-amount vice-amt">−$49.99</div></div>
+      <div class="tx-row"><div class="tx-emoji">💵</div><div class="tx-info"><div class="tx-name">Direct Deposit</div><div class="tx-date">Feb 15</div></div><div class="tx-amount credit">+$2,600.00</div></div>
+    </div>
+    <div class="h20"></div>
+  </div>
+
+  <!-- VENDORS PAGE -->
+  <div class="page" id="page-vendors">
+    <div style="padding:18px 18px 0"><div style="font-size:24px;font-weight:800;margin-bottom:4px">Recurring Vendors</div><div style="font-size:13px;color:var(--muted)">Price drift tracked month to month</div></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="filterVendors(this,'all')">All</button>
+      <button class="tab-btn" onclick="filterVendors(this,'up')">📈 Rising</button>
+      <button class="tab-btn" onclick="filterVendors(this,'down')">📉 Lower</button>
+      <button class="tab-btn" onclick="filterVendors(this,'same')">→ Stable</button>
+    </div>
+    <div style="height:13px"></div>
+    <div class="vendors-list" id="vendorsList">
+      <div class="vendor-row" data-trend="up"><div class="vendor-flag"></div><div class="vendor-emoji">⛽</div><div class="vendor-info"><div class="vendor-name">Shell Gas Station</div><div class="vendor-freq">Weekly · ~3x/mo</div></div><div class="vendor-right"><div class="vendor-amount">$68.00</div><span class="vendor-delta up">↑ 24%</span></div></div>
+      <div class="vendor-row" data-trend="up"><div class="vendor-emoji">🛒</div><div class="vendor-info"><div class="vendor-name">Whole Foods Market</div><div class="vendor-freq">Weekly</div></div><div class="vendor-right"><div class="vendor-amount">$114.52</div><span class="vendor-delta up">↑ 18%</span></div></div>
+      <div class="vendor-row" data-trend="down"><div class="vendor-emoji">☕</div><div class="vendor-info"><div class="vendor-name">Starbucks</div><div class="vendor-freq">Daily · ~22x/mo</div></div><div class="vendor-right"><div class="vendor-amount">$8.45 avg</div><span class="vendor-delta down">↓ 12%</span></div></div>
+      <div class="vendor-row" data-trend="same"><div class="vendor-emoji">📺</div><div class="vendor-info"><div class="vendor-name">Netflix</div><div class="vendor-freq">Monthly sub</div></div><div class="vendor-right"><div class="vendor-amount">$22.99</div><span class="vendor-delta same">→ Same</span></div></div>
+      <div class="vendor-row" data-trend="up"><div class="vendor-flag"></div><div class="vendor-emoji">🍕</div><div class="vendor-info"><div class="vendor-name">Food Delivery Apps</div><div class="vendor-freq">DoorDash · UberEats</div></div><div class="vendor-right"><div class="vendor-amount">$312/mo</div><span class="vendor-delta up">↑ 47%</span></div></div>
+    </div>
+    <div class="h20"></div>
+  </div>
+
+  <!-- TRANSACTIONS PAGE -->
+  <div class="page" id="page-transactions">
+    <div style="padding:18px 18px 0"><div style="font-size:24px;font-weight:800;margin-bottom:4px">All Transactions</div><div style="font-size:13px;color:var(--muted)">February 2026</div></div>
+    <div style="height:13px"></div>
+    <div class="tx-list">
+      <div style="padding:0 0 5px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px">Today · Feb 22</div>
+      <div class="tx-row"><div class="tx-emoji">🍕</div><div class="tx-info"><div class="tx-name">Domino's Pizza</div><div class="tx-date">7:43 PM · Sapphire</div></div><div class="tx-amount high">−$42.80</div></div>
+      <div class="tx-row" style="border-color:rgba(198,120,221,0.35)"><div class="tx-emoji" style="background:rgba(198,120,221,0.15)">🍸</div><div class="tx-info"><div class="tx-name">Bar Tab — Lucky's <span class="vice-badge purple">VICE</span></div><div class="tx-date">11:30 PM</div></div><div class="tx-amount vice-amt">−$87.00</div></div>
+      <div class="tx-row"><div class="tx-emoji">⛽</div><div class="tx-info"><div class="tx-name">Shell Gas Station</div><div class="tx-date">2:11 PM</div></div><div class="tx-amount debit">−$68.00</div></div>
+      <div style="padding:9px 0 5px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px">Feb 21</div>
+      <div class="tx-row" style="border-color:rgba(255,107,107,0.35)"><div class="tx-emoji" style="background:rgba(255,107,107,0.15)">💋</div><div class="tx-info"><div class="tx-name">OnlyFans Sub <span class="vice-badge red">VICE ⚠</span></div><div class="tx-date">Sapphire ••8823</div></div><div class="tx-amount vice-amt">−$49.99</div></div>
+      <div class="tx-row" style="border-color:rgba(255,107,157,0.35)"><div class="tx-emoji" style="background:rgba(255,107,157,0.15)">💘</div><div class="tx-info"><div class="tx-name">Tinder Gold <span class="vice-badge red">VICE</span></div><div class="tx-date">Monthly sub</div></div><div class="tx-amount vice-amt">−$29.99</div></div>
+      <div style="padding:9px 0 5px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px">Feb 20</div>
+      <div class="tx-row"><div class="tx-emoji">🏧</div><div class="tx-info"><div class="tx-name">Allpoint ATM — CVS</div><div class="tx-date">Out-of-network</div></div><div class="tx-amount atm">−$160.00</div></div>
+      <div class="tx-row"><div class="tx-emoji">🛒</div><div class="tx-info"><div class="tx-name">Whole Foods Market</div><div class="tx-date">Checking</div></div><div class="tx-amount debit">−$114.52</div></div>
+      <div style="padding:9px 0 5px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px">Feb 15</div>
+      <div class="tx-row"><div class="tx-emoji">💵</div><div class="tx-info"><div class="tx-name">Direct Deposit</div><div class="tx-date">Employer payroll</div></div><div class="tx-amount credit">+$2,600.00</div></div>
+    </div>
+    <div class="h20"></div>
+  </div>
+
+  <!-- ATM PAGE -->
+  <div class="page" id="page-atm">
+    <div style="padding:18px 18px 0"><div style="font-size:24px;font-weight:800;margin-bottom:4px">🏧 ATM Tracker</div><div style="font-size:13px;color:var(--muted)">Cash withdrawals + bank fees tracked separately</div></div>
+    <div style="display:flex;gap:10px;padding:14px 18px 0">
+      <div style="flex:1;background:rgba(107,158,255,0.1);border:1px solid rgba(107,158,255,0.25);border-radius:14px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px">Cash Withdrawn</div><div style="font-size:28px;font-weight:800;color:var(--accent4)">$560</div><div style="font-size:11px;color:var(--muted);margin-top:4px">4 withdrawals</div></div>
+      <div style="flex:1;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.25);border-radius:14px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px">Bank Fees Paid</div><div style="font-size:28px;font-weight:800;color:var(--danger)">$14.00</div><div style="font-size:11px;color:var(--muted);margin-top:4px">3 out-of-network</div></div>
+    </div>
+    <div style="margin:13px 18px 0;background:rgba(255,159,67,0.1);border:1px solid rgba(255,159,67,0.3);border-radius:13px;padding:13px;font-size:12px;color:var(--muted);line-height:1.5">💡 <strong style="color:var(--warning)">Fee tip:</strong> $14 in ATM fees this month = <strong style="color:var(--warning)">$168/year</strong> wasted. Use your own Chase ATM.</div>
+    <div class="sec-hdr"><span class="sec-title">February Detail</span><span class="sec-action" onclick="openModal('atmSettingsModal')">⚙ Set Limit</span></div>
+    <div style="padding:0 18px;display:flex;flex-direction:column;gap:8px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:600">Feb 20 — Allpoint ATM (CVS)</span><span style="font-size:11px;padding:3px 8px;background:rgba(255,107,107,0.12);color:var(--danger);border-radius:20px;font-weight:600">Out-of-Network</span></div>
+        <div style="display:flex;gap:18px"><div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Withdrawal</div><div style="font-size:16px;font-weight:700;color:var(--accent4)">$160.00</div></div><div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Fee</div><div style="font-size:16px;font-weight:700;color:var(--danger)">$5.00</div></div><div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total</div><div style="font-size:16px;font-weight:700;color:var(--warning)">$165.00</div></div></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:600">Feb 17 — Chase ATM (Walnut St)</span><span style="font-size:11px;padding:3px 8px;background:rgba(107,255,184,0.12);color:var(--safe);border-radius:20px;font-weight:600">Own Bank ✓</span></div>
+        <div style="display:flex;gap:18px"><div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Withdrawal</div><div style="font-size:16px;font-weight:700;color:var(--accent4)">$200.00</div></div><div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Fee</div><div style="font-size:16px;font-weight:700;color:var(--safe)">$0.00</div></div><div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Total</div><div style="font-size:16px;font-weight:700;color:var(--accent4)">$200.00</div></div></div>
+      </div>
+    </div>
+    <div class="h20"></div>
+  </div>
+
+  <!-- IMPORT PAGE -->
+  <div class="page" id="page-upload">
+    <div style="padding:18px 18px 0"><div style="font-size:24px;font-weight:800;margin-bottom:4px">📄 Statement Import</div><div style="font-size:13px;color:var(--muted)">Upload a bank or credit card statement — we do the matching</div></div>
+    <div style="padding:14px 18px 0">
+      <div id="dropZone" class="drop-zone" onclick="document.getElementById('fileInput').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+        <div style="font-size:40px;margin-bottom:10px">📂</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:5px">Drop your statement here</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px">CSV or PDF · Chase, BofA, Amex, Citi, Capital One + more</div>
+        <div style="display:inline-block;padding:9px 20px;background:var(--accent);color:#000;border-radius:10px;font-weight:700;font-size:13px">Choose File</div>
+        <input type="file" id="fileInput" accept=".csv,.pdf" style="display:none" onchange="handleFile(event)">
+      </div>
+    </div>
+    <div style="margin:12px 18px 0;display:flex;gap:8px">
+      <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;margin-bottom:4px">📊</div><div style="font-size:12px;font-weight:600">CSV</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Best results</div></div>
+      <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;margin-bottom:4px">📑</div><div style="font-size:12px;font-weight:600">PDF</div><div style="font-size:10px;color:var(--muted);margin-top:2px">OCR extraction</div></div>
+      <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;margin-bottom:4px">🔒</div><div style="font-size:12px;font-weight:600">Private</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Locally processed</div></div>
+    </div>
+    <div id="processingCard" style="display:none;margin:14px 18px 0;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center">
+      <div style="font-size:36px;margin-bottom:10px">⚙️</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:5px" id="procTitle">Reading your statement...</div>
+      <div style="font-size:12px;color:var(--muted)" id="procStatus">Parsing transaction rows</div>
+      <div style="margin-top:14px;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div id="progressBar" style="height:100%;background:var(--accent);border-radius:3px;width:0%;transition:width 0.4s"></div></div>
+    </div>
+    <div id="matchResults" style="display:none">
+      <div style="margin:14px 18px 0;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--safe)">47</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:3px">Matched</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--warning)">8</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:3px">New Found</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--vice)">3</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:3px">Vice Flags</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--danger)">2</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:3px">Conflicts</div></div>
+      </div>
+      <div style="margin:13px 18px 0;background:var(--vice-dark);border:1px solid var(--vice-border);border-radius:14px;padding:14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:18px">🚨</span><span style="font-weight:700;color:var(--vice);font-size:14px">3 Vice Transactions Found</span></div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(198,120,221,0.1);border-radius:10px"><span style="font-size:15px">🔞</span><div style="flex:1"><div style="font-size:12px;font-weight:600">ONLYFANS.COM</div><div style="font-size:10px;color:var(--muted)">Feb 21 · Already tracked ✓</div></div><span style="font-size:13px;font-weight:700;color:var(--danger)">−$49.99</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.25);border-radius:10px"><span style="font-size:15px">🎰</span><div style="flex:1"><div style="font-size:12px;font-weight:600">DRAFTKINGS SPORTSBOOK</div><div style="font-size:10px;color:var(--muted)">Feb 20 · NOT in your records — add?</div></div><span style="font-size:13px;font-weight:700;color:var(--danger)">−$75.00</span></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(198,120,221,0.1);border-radius:10px"><span style="font-size:15px">🍺</span><div style="flex:1"><div style="font-size:12px;font-weight:600">TOTAL WINE &amp; MORE</div><div style="font-size:10px;color:var(--muted)">Feb 19 · Already tracked ✓</div></div><span style="font-size:13px;font-weight:700;color:var(--warning)">−$64.50</span></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button onclick="alert('✅ DraftKings $75.00 added to Gambling.\n📱 Text + email alert sent — Gambling at 96% of limit!')" style="flex:1;padding:9px;background:var(--vice);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">Add Missing Vice Tx</button>
+          <button onclick="setPage('vice',document.querySelectorAll('.nav-item')[6])" style="flex:1;padding:9px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">View Vice Tracker</button>
+        </div>
+      </div>
+      <div style="padding:16px 18px 8px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">New Transactions</span><span style="font-size:12px;color:var(--accent);font-weight:600;cursor:pointer" onclick="alert('✅ All 8 new transactions added!')">Add All →</span></div>
+      <div style="padding:0 18px;display:flex;flex-direction:column;gap:7px">
+        <div id="newTx1" style="background:var(--surface);border:1px solid var(--warning);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;background:rgba(255,159,67,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px">🎰</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">DraftKings Sportsbook <span class="vice-badge purple">VICE</span></div><div style="font-size:11px;color:var(--muted)">Feb 20 · Auto-tagged: Gambling</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--danger)">−$75.00</div>
+          <div style="display:flex;gap:5px;margin-top:5px">
+            <button onclick="document.getElementById('newTx1').style.opacity='0.4';this.textContent='✓ Added';this.style.background='var(--safe)'" style="padding:3px 9px;background:var(--safe);color:#000;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer">✓ Add</button>
+            <button onclick="document.getElementById('newTx1').style.opacity='0.3'" style="padding:3px 9px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:10px;cursor:pointer">Skip</button>
+          </div></div>
+        </div>
+        <div id="newTx2" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px">🛍️</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Amazon.com</div><div style="font-size:11px;color:var(--muted)">Feb 18 · Auto-tagged: Shopping</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700">−$34.99</div>
+          <div style="display:flex;gap:5px;margin-top:5px">
+            <button onclick="document.getElementById('newTx2').style.opacity='0.4';this.textContent='✓ Added'" style="padding:3px 9px;background:var(--safe);color:#000;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer">✓ Add</button>
+            <button onclick="document.getElementById('newTx2').style.opacity='0.3'" style="padding:3px 9px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:10px;cursor:pointer">Skip</button>
+          </div></div>
+        </div>
+      </div>
+      <div style="margin:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">✅</span>
+        <div><div style="font-size:13px;font-weight:700">47 transactions matched perfectly</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Dates, amounts, and vendors all confirmed</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUDGET PAGE -->
+  <div class="page" id="page-budget">
+    <div style="padding:18px 18px 0"><div style="font-size:24px;font-weight:800;margin-bottom:4px">Budget</div><div style="font-size:13px;color:var(--muted)">February 2026 · 7 days remaining</div></div>
+    <div style="height:14px"></div>
+    <div class="cat-grid">
+      <div class="cat-card"><div class="cat-name">🍽 Dining</div><div class="cat-amount" style="color:var(--danger)">$312</div><div class="cat-bar-bg"><div class="cat-bar-fill" style="width:89%;background:var(--danger)"></div></div><div class="cat-pct">89% of $350</div></div>
+      <div class="cat-card"><div class="cat-name">🛒 Groceries</div><div class="cat-amount" style="color:var(--warning)">$420</div><div class="cat-bar-bg"><div class="cat-bar-fill" style="width:70%;background:var(--warning)"></div></div><div class="cat-pct">70% of $600</div></div>
+      <div class="cat-card"><div class="cat-name">⛽ Transport</div><div class="cat-amount" style="color:var(--warning)">$190</div><div class="cat-bar-bg"><div class="cat-bar-fill" style="width:63%;background:var(--warning)"></div></div><div class="cat-pct">63% of $300</div></div>
+      <div class="cat-card" style="border-color:var(--vice-border)"><div class="cat-name">⚠️ Vices</div><div class="cat-amount" style="color:var(--vice)">$847</div><div class="cat-bar-bg"><div class="cat-bar-fill" style="width:100%;background:var(--danger)"></div></div><div class="cat-pct" style="color:var(--danger)">134% — OVER</div></div>
+      <div class="cat-card"><div class="cat-name">🏠 Housing</div><div class="cat-amount" style="color:var(--safe)">$1,800</div><div class="cat-bar-bg"><div class="cat-bar-fill" style="width:100%;background:var(--safe)"></div></div><div class="cat-pct">Paid ✓</div></div>
+      <div class="cat-card"><div class="cat-name">🏧 ATM Cash</div><div class="cat-amount" style="color:var(--accent4)">$574</div><div class="cat-bar-bg"><div class="cat-bar-fill" style="width:76%;background:var(--accent4)"></div></div><div class="cat-pct">76% of $750</div></div>
+    </div>
+    <div class="sec-hdr" style="margin-top:10px"><span class="sec-title">Month vs Month</span></div>
+    <div class="compare-chart">
+      <div class="compare-row"><div class="compare-label"><span>🍽 Dining</span><span style="color:var(--danger)">+47%</span></div><div class="compare-bars"><div class="bar-prev" style="width:35%"></div><div class="bar-curr" style="width:52%;background:var(--danger)"></div></div></div>
+      <div class="compare-row"><div class="compare-label"><span>🛒 Groceries</span><span style="color:var(--warning)">+18%</span></div><div class="compare-bars"><div class="bar-prev" style="width:45%"></div><div class="bar-curr" style="width:53%;background:var(--warning)"></div></div></div>
+      <div class="compare-row"><div class="compare-label"><span>⚠️ Vices</span><span style="color:var(--danger)">+34%</span></div><div class="compare-bars"><div class="bar-prev" style="width:28%"></div><div class="bar-curr" style="width:38%;background:var(--vice)"></div></div></div>
+    </div>
+    <div class="h20"></div>
+  </div>
+
+  <!-- VICE TRACKER PAGE -->
+  <div class="page" id="page-vice">
+    <div class="vice-page-header">
+      <div class="vice-header-top">
+        <div><div class="vice-title">⚠️ Vice Tracker</div><div class="vice-subtitle">Addictive &amp; high-risk spending · Feb 2026</div></div>
+        <div class="vice-warning-badge">🚨 OVER<br>LIMIT</div>
+      </div>
+      <div class="vice-summary-grid">
+        <div class="vice-summary-item"><div class="vice-summary-val">$847</div><div class="vice-summary-label">This Month</div></div>
+        <div class="vice-summary-item"><div class="vice-summary-val" style="color:var(--danger)">+34%</div><div class="vice-summary-label">vs Last Mo</div></div>
+        <div class="vice-summary-item"><div class="vice-summary-val" style="color:var(--warning)">$630</div><div class="vice-summary-label">Your Limit</div></div>
+      </div>
+    </div>
+    <div class="vice-big-warning">
+      <div class="vice-warn-head"><div class="vice-warn-icon">🚨</div><div><div class="vice-warn-title">You've Blown Past Your Vice Budget</div><div class="vice-warn-sub">$847 spent · $217 over your $630 limit · Alert sent via text &amp; email</div></div></div>
+      <div class="vice-warn-stats">
+        <div class="vice-warn-stat"><div class="vice-warn-stat-val">$217</div><div class="vice-warn-stat-label">Over limit</div></div>
+        <div class="vice-warn-stat"><div class="vice-warn-stat-val">6</div><div class="vice-warn-stat-label">Categories</div></div>
+        <div class="vice-warn-stat"><div class="vice-warn-stat-val">23</div><div class="vice-warn-stat-label">Transactions</div></div>
+        <div class="vice-warn-stat"><div class="vice-warn-stat-val" style="color:var(--warning)">$10K</div><div class="vice-warn-stat-label">Est. yearly</div></div>
+      </div>
+      <div class="vice-action-row">
+        <button class="vice-action-btn primary" onclick="openModal('viceLimitModal')">⚙ Adjust Limits</button>
+        <button class="vice-action-btn secondary" onclick="openModal('viceHelpModal')">🤝 Get Support</button>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn vice-tab active" onclick="filterVice(this,'all')">All</button>
+      <button class="tab-btn vice-tab" onclick="filterVice(this,'alcohol')">🍺 Alcohol</button>
+      <button class="tab-btn vice-tab" onclick="filterVice(this,'adult')">🔞 Adult</button>
+      <button class="tab-btn vice-tab" onclick="filterVice(this,'dating')">💘 Dating</button>
+      <button class="tab-btn vice-tab" onclick="filterVice(this,'gambling')">🎰 Gambling</button>
+      <button class="tab-btn vice-tab" onclick="filterVice(this,'subscriptions')">📦 Subs</button>
+      <button class="tab-btn vice-tab" onclick="filterVice(this,'drugs')">💊 Substances</button>
+    </div>
+    <div style="height:14px"></div>
+    <div class="vice-cats" id="viceCats">
+      <div class="vice-cat-card alcohol alert-level" data-vice="alcohol">
+        <div class="vice-cat-top"><div class="vice-cat-icon alcohol">🍺</div><div class="vice-cat-info"><div class="vice-cat-name">Alcohol &amp; Bars</div><div class="vice-cat-count">8 transactions this month</div></div><div class="vice-cat-right"><div class="vice-cat-amt" style="color:var(--danger)">$312</div><div class="vice-cat-change up">↑ 61% vs last mo</div></div></div>
+        <div class="vice-cat-bar-bg"><div class="vice-cat-bar-fill" style="width:92%;background:var(--danger)"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px">92% of $340 limit · <span style="color:var(--danger);font-weight:600">⚠ Alert fired</span></div>
+        <div class="vice-cat-transactions">
+          <div class="vice-tx"><div class="vice-tx-name">Bar Tab — Lucky's Lounge</div><div class="vice-tx-date">Feb 22</div><div class="vice-tx-amt" style="color:var(--danger)">−$87.00</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">Total Wine &amp; More</div><div class="vice-tx-date">Feb 19</div><div class="vice-tx-amt" style="color:var(--warning)">−$64.50</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">Applebee's Bar</div><div class="vice-tx-date">Feb 15</div><div class="vice-tx-amt" style="color:var(--warning)">−$52.00</div></div>
+        </div>
+      </div>
+      <div class="vice-cat-card adult alert-level" data-vice="adult">
+        <div class="vice-cat-top"><div class="vice-cat-icon adult">🔞</div><div class="vice-cat-info"><div class="vice-cat-name">Adult Content &amp; Services</div><div class="vice-cat-count">4 transactions this month</div></div><div class="vice-cat-right"><div class="vice-cat-amt" style="color:var(--danger)">$184</div><div class="vice-cat-change up">↑ 83% vs last mo</div></div></div>
+        <div class="vice-cat-bar-bg"><div class="vice-cat-bar-fill" style="width:100%;background:var(--danger)"></div></div>
+        <div style="font-size:10px;color:var(--danger);font-weight:700;margin-bottom:10px">🚨 OVER LIMIT — 3 months increasing</div>
+        <div class="vice-cat-transactions">
+          <div class="vice-tx"><div class="vice-tx-name">OnlyFans Subscription</div><div class="vice-tx-date">Feb 21</div><div class="vice-tx-amt" style="color:var(--danger)">−$49.99</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">Adult Site Premium</div><div class="vice-tx-date">Feb 14</div><div class="vice-tx-amt" style="color:var(--danger)">−$39.99</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">Escort / Entertainment</div><div class="vice-tx-date">Feb 10</div><div class="vice-tx-amt" style="color:var(--danger)">−$94.00</div></div>
+        </div>
+      </div>
+      <div class="vice-cat-card dating" data-vice="dating">
+        <div class="vice-cat-top"><div class="vice-cat-icon dating">💘</div><div class="vice-cat-info"><div class="vice-cat-name">Dating Apps &amp; Sites</div><div class="vice-cat-count">3 active subscriptions</div></div><div class="vice-cat-right"><div class="vice-cat-amt" style="color:var(--warning)">$89</div><div class="vice-cat-change up">↑ 22% vs last mo</div></div></div>
+        <div class="vice-cat-bar-bg"><div class="vice-cat-bar-fill" style="width:74%;background:#ff6b9d"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px">74% of $120 limit</div>
+        <div class="vice-cat-transactions">
+          <div class="vice-tx"><div class="vice-tx-name">Tinder Gold</div><div class="vice-tx-date">Feb 21</div><div class="vice-tx-amt" style="color:#ff6b9d">−$29.99</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">Bumble Premium</div><div class="vice-tx-date">Feb 18</div><div class="vice-tx-amt" style="color:#ff6b9d">−$34.99</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">Match.com</div><div class="vice-tx-date">Feb 10</div><div class="vice-tx-amt" style="color:#ff6b9d">−$23.99</div></div>
+        </div>
+      </div>
+      <div class="vice-cat-card gambling warn-level" data-vice="gambling">
+        <div class="vice-cat-top"><div class="vice-cat-icon gambling">🎰</div><div class="vice-cat-info"><div class="vice-cat-name">Gambling &amp; Betting</div><div class="vice-cat-count">5 transactions this month</div></div><div class="vice-cat-right"><div class="vice-cat-amt" style="color:var(--warning)">$148</div><div class="vice-cat-change up">↑ 17% vs last mo</div></div></div>
+        <div class="vice-cat-bar-bg"><div class="vice-cat-bar-fill" style="width:82%;background:var(--accent)"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px">82% of $180 limit · <span style="color:var(--warning)">⚠ Approaching limit</span></div>
+        <div class="vice-cat-transactions">
+          <div class="vice-tx"><div class="vice-tx-name">DraftKings Sportsbook</div><div class="vice-tx-date">Feb 20</div><div class="vice-tx-amt" style="color:var(--accent)">−$50.00</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">FanDuel</div><div class="vice-tx-date">Feb 16</div><div class="vice-tx-amt" style="color:var(--accent)">−$38.00</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">Casino ATM (linked)</div><div class="vice-tx-date">Feb 10</div><div class="vice-tx-amt" style="color:var(--accent)">−$60.00</div></div>
+        </div>
+      </div>
+      <div class="vice-cat-card subscriptions" data-vice="subscriptions">
+        <div class="vice-cat-top"><div class="vice-cat-icon subscriptions">📦</div><div class="vice-cat-info"><div class="vice-cat-name">Subscription Creep</div><div class="vice-cat-count">11 active subs · 3 unused</div></div><div class="vice-cat-right"><div class="vice-cat-amt" style="color:var(--accent4)">$94</div><div class="vice-cat-change down">↓ 5% vs last mo</div></div></div>
+        <div class="vice-cat-bar-bg"><div class="vice-cat-bar-fill" style="width:78%;background:var(--accent4)"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px">78% of $120 limit</div>
+        <div style="background:rgba(107,158,255,0.1);border:1px solid rgba(107,158,255,0.2);border-radius:10px;padding:10px;font-size:12px;color:var(--muted);margin-bottom:10px">💡 <strong style="color:var(--accent4)">3 unused subs:</strong> Cancel Headspace, Duolingo Plus, Paramount+ to save <strong style="color:var(--accent4)">$28.97/mo</strong></div>
+        <div class="vice-cat-transactions">
+          <div class="vice-tx"><div class="vice-tx-name">Netflix</div><div class="vice-tx-date">Feb 14</div><div class="vice-tx-amt" style="color:var(--accent4)">−$22.99</div></div>
+          <div class="vice-tx"><div class="vice-tx-name">Spotify</div><div class="vice-tx-date">Feb 12</div><div class="vice-tx-amt" style="color:var(--accent4)">−$11.99</div></div>
+          <div class="vice-tx" style="opacity:0.5"><div class="vice-tx-name">Headspace <span class="vice-badge yellow">UNUSED</span></div><div class="vice-tx-date">Feb 1</div><div class="vice-tx-amt" style="color:var(--warning)">−$12.99</div></div>
+        </div>
+      </div>
+      <div class="vice-cat-card drugs" data-vice="drugs">
+        <div class="vice-cat-top"><div class="vice-cat-icon drugs">💊</div><div class="vice-cat-info"><div class="vice-cat-name">Substances &amp; Dispensaries</div><div class="vice-cat-count">2 transactions this month</div></div><div class="vice-cat-right"><div class="vice-cat-amt" style="color:var(--vice)">$20</div><div class="vice-cat-change" style="color:var(--muted)">→ Similar</div></div></div>
+        <div class="vice-cat-bar-bg"><div class="vice-cat-bar-fill" style="width:40%;background:var(--vice)"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:10px">40% of $50 limit</div>
+        <div class="vice-cat-transactions">
+          <div class="vice-tx"><div class="vice-tx-name">Green Thumb Dispensary</div><div class="vice-tx-date">Feb 18</div><div class="vice-tx-amt" style="color:var(--vice)">−$20.00</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">3-Month Trend</span></div>
+    <div class="vice-trend-card">
+      <div class="vice-trend-title">Monthly vice spending — all categories</div>
+      <div class="vice-trend-row"><div class="vice-trend-label"><span>🍺 Alcohol</span><span style="color:var(--danger)">↑ 61%</span></div><div class="vice-trend-bar-bg"><div class="vice-trend-bar" style="width:85%;background:var(--warning)"></div></div></div>
+      <div class="vice-trend-row"><div class="vice-trend-label"><span>🔞 Adult Content</span><span style="color:var(--danger)">↑ 83%</span></div><div class="vice-trend-bar-bg"><div class="vice-trend-bar" style="width:100%;background:var(--danger)"></div></div></div>
+      <div class="vice-trend-row"><div class="vice-trend-label"><span>💘 Dating Apps</span><span style="color:var(--warning)">↑ 22%</span></div><div class="vice-trend-bar-bg"><div class="vice-trend-bar" style="width:60%;background:#ff6b9d"></div></div></div>
+      <div class="vice-trend-row"><div class="vice-trend-label"><span>🎰 Gambling</span><span style="color:var(--warning)">↑ 17%</span></div><div class="vice-trend-bar-bg"><div class="vice-trend-bar" style="width:70%;background:var(--accent)"></div></div></div>
+      <div class="vice-trend-row" style="margin-bottom:0"><div class="vice-trend-label"><span>📦 Subscriptions</span><span style="color:var(--safe)">↓ 5%</span></div><div class="vice-trend-bar-bg"><div class="vice-trend-bar" style="width:55%;background:var(--accent4)"></div></div></div>
+    </div>
+    <div class="vice-support-box">
+      <div class="vice-support-title">🤝 Need Support?</div>
+      <div class="vice-support-text">FocusFlow isn't here to judge. If any of these numbers feel out of control, real help is one tap away.</div>
+      <div class="vice-support-links">
+        <div class="vice-support-link"><div class="vice-support-link-icon">📞</div><div class="vice-support-link-text"><div class="vice-support-link-name">SAMHSA Helpline</div><div class="vice-support-link-sub">Alcohol &amp; substances · 1-800-662-4357 · Free 24/7</div></div></div>
+        <div class="vice-support-link"><div class="vice-support-link-icon">🎰</div><div class="vice-support-link-text"><div class="vice-support-link-name">National Problem Gambling Helpline</div><div class="vice-support-link-sub">1-800-522-4700 · Chat &amp; text available</div></div></div>
+        <div class="vice-support-link"><div class="vice-support-link-icon">🧠</div><div class="vice-support-link-text"><div class="vice-support-link-name">CHADD — ADHD Adults</div><div class="vice-support-link-sub">chadd.org · Impulse control &amp; finances</div></div></div>
+        <div class="vice-support-link"><div class="vice-support-link-icon">💬</div><div class="vice-support-link-text"><div class="vice-support-link-name">Crisis Text Line</div><div class="vice-support-link-sub">Text HOME to 741741 · Always free</div></div></div>
+      </div>
+    </div>
+    <div class="h20"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="setPage('home',this)"><span class="nav-icon">🏠</span>Home</div>
+    <div class="nav-item" onclick="setPage('vendors',this)"><span class="nav-icon">🔁</span>Vendors</div>
+    <div class="nav-item" onclick="setPage('transactions',this)"><span class="nav-icon">📋</span>History</div>
+    <div class="nav-item" onclick="setPage('atm',this)"><span class="nav-icon">🏧</span>ATM</div>
+    <div class="nav-item" onclick="setPage('upload',this)"><span class="nav-icon">📄</span>Import</div>
+    <div class="nav-item" onclick="setPage('budget',this)"><span class="nav-icon">📊</span>Budget</div>
+    <div class="nav-item vice-nav" onclick="setPage('vice',this)"><span class="nav-icon">⚠️</span>Vices</div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="addAccountModal" onclick="closeModal('addAccountModal')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Link an Account</div>
+    <div class="modal-sub">Secure connection via Plaid open banking</div>
+    <div class="bank-option"><div class="bank-logo" style="background:#0d47a1">🏦</div><div><div class="bank-name">Chase</div><div class="bank-type">Checking, Savings, Credit</div></div><span class="connect-btn">Connect →</span></div>
+    <div class="bank-option"><div class="bank-logo" style="background:#c41230">🏦</div><div><div class="bank-name">Bank of America</div><div class="bank-type">Checking, Savings, Credit</div></div><span class="connect-btn">Connect →</span></div>
+    <div class="bank-option"><div class="bank-logo" style="background:#003087">💳</div><div><div class="bank-name">PayPal / Venmo</div><div class="bank-type">Digital wallet</div></div><span class="connect-btn">Connect →</span></div>
+    <div class="bank-option"><div class="bank-logo" style="background:#333">🔍</div><div><div class="bank-name">Search All Banks</div><div class="bank-type">10,000+ institutions</div></div><span class="connect-btn">Search →</span></div>
+    <button class="btn-primary" onclick="closeModal('addAccountModal')">Done</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="notifModal" onclick="closeModal('notifModal')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📲 Alert Delivery</div>
+    <div class="modal-sub">Get a text or email the moment something is off.</div>
+    <div class="notif-channel active-ch" onclick="this.classList.toggle('active-ch')"><div class="notif-icon">📱</div><div class="notif-info"><div class="notif-name">Text Message (SMS)</div><div class="notif-detail">Instant · Works without internet</div></div><div class="notif-check">✓</div></div>
+    <div class="notif-channel active-ch" onclick="this.classList.toggle('active-ch')"><div class="notif-icon">📧</div><div class="notif-info"><div class="notif-name">Email</div><div class="notif-detail">Detailed breakdown included</div></div><div class="notif-check">✓</div></div>
+    <div class="notif-channel" onclick="this.classList.toggle('active-ch')"><div class="notif-icon">🔔</div><div class="notif-info"><div class="notif-name">Push Notification</div><div class="notif-detail">App must be installed</div></div><div class="notif-check">✓</div></div>
+    <div style="height:14px"></div>
+    <div class="form-field"><label class="form-label">Phone Number</label><input class="form-input" type="tel" value="(555) 012-3456"></div>
+    <div class="form-field"><label class="form-label">Email Address</label><input class="form-input" type="email" value="nycchefman99@gmail.com"></div>
+    <div class="form-field"><label class="form-label">Backup Email</label><input class="form-input" type="email" placeholder="family member, etc."></div>
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin:4px 0 12px">Alert thresholds</div>
+    <div class="threshold-row"><div><div class="threshold-label">Single charge over</div><div class="threshold-sub">Immediate text + email</div></div><input class="threshold-input" value="$100"></div>
+    <div class="threshold-row"><div><div class="threshold-label">Category spike above</div><div class="threshold-sub">% above monthly avg</div></div><input class="threshold-input" value="20%"></div>
+    <div class="threshold-row"><div><div class="threshold-label">Vice limit exceeded</div></div><input class="threshold-input" value="Any"></div>
+    <div class="threshold-row"><div><div class="threshold-label">ATM fee detected</div></div><input class="threshold-input" value="Any"></div>
+    <button class="btn-primary" style="margin-top:14px" onclick="closeModal('notifModal');alert('✅ Alert settings saved!')">Save Settings</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="alertsModal" onclick="closeModal('alertsModal')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔔 Alert Settings</div>
+    <div class="modal-sub">Choose what triggers a text or email</div>
+    <div class="toggle-row"><div><div class="toggle-label">Spending Spike</div><div class="toggle-sub">Category 20%+ above normal</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><div><div class="toggle-label">Budget % Warnings</div><div class="toggle-sub">At 50%, 75%, 90% used</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><div><div class="toggle-label">Vice Category Alert</div><div class="toggle-sub">Any vice transaction detected</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><div><div class="toggle-label">Vice Limit Exceeded</div><div class="toggle-sub">Instant text + email when over limit</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><div><div class="toggle-label">ATM Fee Detected</div><div class="toggle-sub">Any out-of-network ATM fee</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><div><div class="toggle-label">Payday Reminder</div><div class="toggle-sub">5 and 2 days before payday</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><div><div class="toggle-label">Large Transaction</div><div class="toggle-sub">Single charge over $100</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><div><div class="toggle-label">Income Confirmed</div><div class="toggle-sub">Text when paycheck lands</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <button class="btn-primary" style="margin-top:14px" onclick="closeModal('alertsModal')">Save</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="viceLimitModal" onclick="closeModal('viceLimitModal')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚠️ Vice Spending Limits</div>
+    <div class="modal-sub">Alerts fire at 80% of each limit, then again when you go over.</div>
+    <div class="threshold-row"><div><div class="threshold-label">🍺 Alcohol &amp; Bars</div></div><input class="threshold-input" value="$340"></div>
+    <div class="threshold-row"><div><div class="threshold-label">🔞 Adult Content</div></div><input class="threshold-input" value="$150"></div>
+    <div class="threshold-row"><div><div class="threshold-label">💘 Dating Apps</div></div><input class="threshold-input" value="$120"></div>
+    <div class="threshold-row"><div><div class="threshold-label">🎰 Gambling &amp; Betting</div></div><input class="threshold-input" value="$180"></div>
+    <div class="threshold-row"><div><div class="threshold-label">📦 Subscriptions</div></div><input class="threshold-input" value="$120"></div>
+    <div class="threshold-row"><div><div class="threshold-label">💊 Substances</div></div><input class="threshold-input" value="$50"></div>
+    <div class="threshold-row"><div><div class="threshold-label">🔴 Overall Vice Budget</div></div><input class="threshold-input" value="$630"></div>
+    <div style="height:8px"></div>
+    <div class="toggle-row"><div><div class="toggle-label">Alert at 80% of each limit</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><div><div class="toggle-label">Send to backup contact too</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <button class="btn-primary" style="margin-top:14px" onclick="closeModal('viceLimitModal');alert('✅ Vice limits saved!')">Save Limits</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="viceHelpModal" onclick="closeModal('viceHelpModal')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🤝 Support Resources</div>
+    <div class="modal-sub">No judgment — just help. These are free and confidential.</div>
+    <div class="vice-support-links">
+      <div class="vice-support-link"><div class="vice-support-link-icon">📞</div><div class="vice-support-link-text"><div class="vice-support-link-name">SAMHSA National Helpline</div><div class="vice-support-link-sub">Alcohol &amp; drugs · 1-800-662-4357 · Free 24/7</div></div></div>
+      <div class="vice-support-link"><div class="vice-support-link-icon">🎰</div><div class="vice-support-link-text"><div class="vice-support-link-name">National Problem Gambling Helpline</div><div class="vice-support-link-sub">1-800-522-4700 · Chat &amp; text available</div></div></div>
+      <div class="vice-support-link"><div class="vice-support-link-icon">🧠</div><div class="vice-support-link-text"><div class="vice-support-link-name">CHADD — ADHD Adults</div><div class="vice-support-link-sub">chadd.org · Impulse control &amp; finances</div></div></div>
+      <div class="vice-support-link"><div class="vice-support-link-icon">💬</div><div class="vice-support-link-text"><div class="vice-support-link-name">Crisis Text Line</div><div class="vice-support-link-sub">Text HOME to 741741 · Always free</div></div></div>
+      <div class="vice-support-link"><div class="vice-support-link-icon">🔒</div><div class="vice-support-link-text"><div class="vice-support-link-name">Sex Addicts Anonymous</div><div class="vice-support-link-sub">saa.org · Confidential meetings</div></div></div>
+      <div class="vice-support-link"><div class="vice-support-link-icon">💰</div><div class="vice-support-link-text"><div class="vice-support-link-name">Debtors Anonymous</div><div class="vice-support-link-sub">debtorsanonymous.org · Spending compulsion</div></div></div>
+    </div>
+    <button class="btn-primary" style="margin-top:16px" onclick="closeModal('viceHelpModal')">Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="atmSettingsModal" onclick="closeModal('atmSettingsModal')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏧 ATM Limits</div>
+    <div class="modal-sub">Set limits and get alerted before you go over</div>
+    <div class="form-field"><label class="form-label">Monthly Cash Withdrawal Limit</label><input class="form-input" value="$600"></div>
+    <div class="form-field"><label class="form-label">Monthly ATM Fee Limit</label><input class="form-input" value="$10"></div>
+    <div class="form-field"><label class="form-label">Single Withdrawal Alert Over</label><input class="form-input" value="$200"></div>
+    <div class="toggle-row"><div><div class="toggle-label">Alert on any out-of-network fee</div><div class="toggle-sub">Immediate text + email</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <button class="btn-primary" style="margin-top:14px" onclick="closeModal('atmSettingsModal')">Save Limits</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal" onclick="closeModal('settingsModal')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙ Settings</div>
+    <div class="modal-sub">Set up your pay cycle and income</div>
+    <div class="form-field"><label class="form-label">Monthly Take-Home Income</label><input class="form-input" value="$5,200"></div>
+    <div class="form-field"><label class="form-label">Monthly Spending Budget</label><input class="form-input" value="$3,900"></div>
+    <div class="form-field"><label class="form-label">Pay Frequency</label>
+      <select class="form-input"><option>Bi-weekly (every 2 weeks)</option><option>Semi-monthly (1st &amp; 15th)</option><option>Monthly</option><option>Weekly</option></select>
+    </div>
+    <div class="form-field"><label class="form-label">Next Payday</label><input class="form-input" type="date" value="2026-03-01"></div>
+    <button class="btn-primary" onclick="closeModal('settingsModal');alert('✅ Settings saved!')">Save Settings</button>
+  </div>
+</div>
+
+<script>
+function startApp(){
+  document.getElementById('welcomeScreen').classList.add('hidden');
+  document.getElementById('appShell').style.display='block';
+  setTimeout(animateRing,400);
+  updateCountdowns();
+}
+function animateRing(){
+  var pct=0.68,ring=document.getElementById('budgetRing');
+  if(!ring)return;
+  ring.style.strokeDashoffset=264-(pct*264);
+  var c=pct>0.85?'var(--danger)':pct>0.65?'var(--warning)':'var(--safe)';
+  ring.style.stroke=c;
+  var el=document.getElementById('ringPct');
+  if(el)el.style.color=c;
+}
+function updateCountdowns(){
+  var today=new Date();
+  var nextMonth=new Date(today.getFullYear(),today.getMonth()+1,1);
+  var daysLeft=Math.ceil((nextMonth-today)/86400000);
+  var r=document.getElementById('resetCount');
+  if(r)r.textContent=daysLeft;
+  var payday=new Date('2026-03-01');
+  var dtp=Math.ceil((payday-today)/86400000);
+  var p=document.getElementById('paydayCount');
+  if(p)p.textContent=Math.max(0,dtp);
+}
+function setPage(name,navEl){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  var pg=document.getElementById('page-'+name);
+  if(pg)pg.classList.add('active');
+  if(navEl)navEl.classList.add('active');
+}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function filterVendors(btn,filter){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  document.querySelectorAll('#vendorsList .vendor-row').forEach(function(row){
+    row.style.display=(filter==='all'||row.dataset.trend===filter)?'':'none';
+  });
+}
+function filterVice(btn,filter){
+  document.querySelectorAll('#page-vice .tab-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  document.querySelectorAll('#viceCats .vice-cat-card').forEach(function(card){
+    card.style.display=(filter==='all'||card.dataset.vice===filter)?'':'none';
+  });
+}
+function dragOver(e){e.preventDefault();document.getElementById('dropZone').classList.add('hover')}
+function dragLeave(){document.getElementById('dropZone').classList.remove('hover')}
+function dropFile(e){e.preventDefault();dragLeave();runImport()}
+function handleFile(){runImport()}
+function runImport(){
+  document.getElementById('dropZone').style.display='none';
+  document.getElementById('processingCard').style.display='block';
+  document.getElementById('matchResults').style.display='none';
+  var steps=[
+    [15,'Reading your statement...','Detecting format: CSV'],
+    [35,'Parsing transactions...','Found 58 rows'],
+    [55,'Running smart match...','Comparing against your records'],
+    [72,'Scanning for vice patterns...','Checking merchant categories'],
+    [88,'Flagging conflicts...','Amount mismatch on 2 items'],
+    [100,'Done!','58 transactions processed']
+  ];
+  var i=0,bar=document.getElementById('progressBar'),
+      title=document.getElementById('procTitle'),
+      status=document.getElementById('procStatus');
+  var timer=setInterval(function(){
+    if(i>=steps.length){
+      clearInterval(timer);
+      setTimeout(function(){
+        document.getElementById('processingCard').style.display='none';
+        document.getElementById('matchResults').style.display='block';
+      },600);
+      return;
+    }
+    bar.style.width=steps[i][0]+'%';
+    title.textContent=steps[i][1];
+    status.textContent=steps[i][2];
+    i++;
+  },700);
+}
+</script>
+</body>
+</html>
